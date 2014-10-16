@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
-    <title>Megaventory Status</title>
-	<meta name="description" content="Service status page of Megaventory." />
-	<meta name="keywords" content="Megaventory Service Uptime, Megaventory Service Status, Megaventory Status" />
+    <title>My Status Page</title>
+	<meta name="description" content="Add your description here" />
+	<meta name="keywords" content="Add your keywords here" />
 	
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
 	
@@ -141,7 +141,7 @@
 	            document.body.appendChild(img);
 	            starttime = new Date();
 	            img.setAttribute('onLoad', 'if (shouldLoad != 0) {shouldLoad = 1; var PingTimeControl = document.getElementById("PingTime"); var PingTimer = new Date() - starttime; PingTimeControl.innerHTML = PingTimer + "ms"; if (PingTimer < 200) {PingTimeControl.style.color = "green"} else if (PingTimer < 500) {PingTimeControl.style.color = "orange"} else {PingTimeControl.style.color = "red"} }');
-	            pingtimer = setInterval('clearInterval(pingtimer); if (shouldLoad != 1) {var PingTimeWrapper = document.getElementById("PingTimeWrapper"); PingTimeWrapper.style.color = "red"; PingTimeWrapper.innerHTML = "Megaventory is Operating Normally but is unaccessible from your location. Seems like a routing problem !"; shouldLoad = 0; }', 5000);
+	            pingtimer = setInterval('clearInterval(pingtimer); if (shouldLoad != 1) {var PingTimeWrapper = document.getElementById("PingTimeWrapper"); PingTimeWrapper.style.color = "red"; PingTimeWrapper.innerHTML = "*Website* is Operating Normally but is unaccessible from your location. Seems like a routing problem !"; shouldLoad = 0; }', 5000);
 	            //Add the location of a 1x1 image file (with minimal packet size = near zero loading time). The image must be hosted in the server where the application resides.
 	            img.src = 'http://www.yourwebsite.com/images/yourSmallImage.gif' + '?' + RandNum; //the timer stops (the onLoad fires) when the src attribute is added to the img. RandNum ensures the image is not cached by the browser.
 	        }
