@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Megaventory Status</title>
+	<meta name="description" content="Service status page of Megaventory." />
+	<meta name="keywords" content="Megaventory Service Uptime, Megaventory Service Status, Megaventory Status" />
+	
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+	
+    <script type='text/javascript' >
+
+	    google.load('visualization', '1', { packages: ['gauge'] });
+	    var starttime;
+	    var pingtimer;
+	    var shouldLoad;
+
+	</script>
+
+</head>
+
+<body>
+
+	<div style="font-family:Arial;">
+		<div style="width:550px;margin:15px auto 15px auto;padding-bottom:15px;border-bottom:solid 1px gray;">
+			<span style="font-size: 23px;">My website status<br />
+				<span id="StatusMessage" style="font-size: 40px;">Please wait...</span>
+			</span>
+			<br />
+			<span id="PingTimeWrapper" style="font-size: 11px;float: right">Server response time: <span id="PingTime">Please wait...</span>
+			</span>
+			
+		</div>
+		<div style="width:550px;margin-left:auto;margin-right:auto;">
+			<span style="font-size:23px;">UpTime stats (%)</span>
+			<br /><br />
+			<div id="chart_div"></div>
+			<span style="font-size:11px;color:Gray;">* Uptime refers to the period of time when my *website* is up and running.</span>
+		</div>
+
+		<!--Twitter client start-->
+		<div style="width:550px;margin-left:auto;margin-right:auto;margin-top:30px;">
+			<a class="twitter-timeline"  href="https://twitter.com/yourTwitterAccountGoesHere"  data-widget-id="yourDataWidgetIdGoesHere">Tweets by @*website*</a>
+			<script>!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + "://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs); } }(document, "script", "twitter-wjs");</script>
+		</div>
+		<!--Twitter client end-->
+		
+	</div>
+
+	<!--Uptime Robot start-->
+	<script type="text/javascript">
+
+	    /*Variables - Start*/
+	    var apiKey = 'yourUpTimeRobotAPIkeyGoesHere'; /*replace with your apiKey*/
+	    var url = 'http://api.uptimerobot.com/getMonitors?apiKey=' + apiKey + '&customUptimeRatio=7-30-365&format=json';
+	    /*Variables - End*/
+
+	    function getJSONP(url, success) {
+
+	        var ud = '_' + +new Date, script = document.createElement('script'), head = document.getElementsByTagName('head')[0] || document.documentElement;
+
+	        window[ud] = function (data) {
+	            head.removeChild(script);
+	            success && success(data);
+	        };
+
+	        script.src = url.replace('callback=?', 'callback=' + ud);
+	        head.appendChild(script);
+
+	    }
+
+	    getJSONP(url);
+
+	    function jsonUptimeRobotApi(data) {
+
+	        /* Status messages
+			0 - paused
+			1 - not checked yet
+			2 - up
+			8 - seems down
+			9 - down
+			*/
+	        var status = data.monitors.monitor[0].status;
+	        var htmlObjectStatus = document.getElementById('StatusMessage');
+	        if (status == 0) { htmlObjectStatus.innerHTML = 'Up-Time check paused'; }
+	        else if (status == 1) { htmlObjectStatus.innerHTML = 'Not checked yet'; }
+	        else if (status == 2) { htmlObjectStatus.innerHTML = 'Operating normally'; htmlObjectStatus.style.color = 'green'; }
+	        else if (status == 8) { htmlObjectStatus.innerHTML = 'Service is disrupted'; htmlObjectStatus.style.color = 'red'; }
+	        else if (status == 9) { htmlObjectStatus.innerHTML = 'Service is disrupted'; htmlObjectStatus.style.color = 'red'; }
+	        else { htmlObjectStatus.innerHTML = 'Try refreshing page again'; }
+
+	        var ArrayOfUptime = data.monitors.monitor[0].customuptimeratio.split("-");
+	        ArrayOfUptime[3] = data.monitors.monitor[0].alltimeuptimeratio; // We add a 4th string to the string array to keep all the percentages together
+
+	        var htmlObjectAllTimeUptime = document.getElementById('AllTimeUptime');
+	        drawChart(ArrayOfUptime); // We pass the ArrayOfUptime array (includes the percentages) to the drawChart function so that Google draws the graphs
+	        PingTimeFun(status);
+
+	    };
+
+	</script>
+	<!--Uptime Robot end-->
+
+	
+	<!--Google charts start-->
+	<script type='text/javascript'>
+
+	    function drawChart(ArrayOfUptime) {
+	        var data = google.visualization.arrayToDataTable([
+				['Label', 'Value'],
+				['Last Week', ArrayOfUptime[0] * 1],
+				['Last Month', ArrayOfUptime[1] * 1],
+				['Last year', ArrayOfUptime[2] * 1],
+				['All Time', ArrayOfUptime[3] * 1]
+	        ]);
+
+	        var options = {
+	            width: 550,
+	            min: 90, max: 100,
+	            redFrom: 90, redTo: 95,
+	            yellowFrom: 95, yellowTo: 99,
+	            greenFrom: 99, greenTo: 100,
+	            minorTicks: 1
+	        };
+
+	        var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+	        chart.draw(data, options);
+	    }
+
+	</script>
+	<!--Google charts end-->
+
+
+	<!--server response time (ping time)-->
+	<script type='text/javascript'>
+
+	    function PingTimeFun(status) {
+
+	        if (status == 2) {
+	            var RandNum = Math.random() + ''.split('.');
+	            var img = document.createElement('img');
+	            document.body.appendChild(img);
+	            starttime = new Date();
+	            img.setAttribute('onLoad', 'if (shouldLoad != 0) {shouldLoad = 1; var PingTimeControl = document.getElementById("PingTime"); var PingTimer = new Date() - starttime; PingTimeControl.innerHTML = PingTimer + "ms"; if (PingTimer < 200) {PingTimeControl.style.color = "green"} else if (PingTimer < 500) {PingTimeControl.style.color = "orange"} else {PingTimeControl.style.color = "red"} }');
+	            pingtimer = setInterval('clearInterval(pingtimer); if (shouldLoad != 1) {var PingTimeWrapper = document.getElementById("PingTimeWrapper"); PingTimeWrapper.style.color = "red"; PingTimeWrapper.innerHTML = "Megaventory is Operating Normally but is unaccessible from your location. Seems like a routing problem !"; shouldLoad = 0; }', 5000);
+	            //Add the location of a 1x1 image file (with minimal packet size = near zero loading time). The image must be hosted in the server where the application resides.
+	            img.src = 'http://www.yourwebsite.com/images/yourSmallImage.gif' + '?' + RandNum; //the timer stops (the onLoad fires) when the src attribute is added to the img. RandNum ensures the image is not cached by the browser.
+	        }
+	        else {
+	            document.getElementById('PingTimeWrapper').setAttribute('style', 'display:none');
+	        }
+	    }
+
+
+
+	</script>
+	<!--end server response time (ping time)-->
+
+</body>
+
+
+</html>
